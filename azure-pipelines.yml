@@ -1,0 +1,29 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  azureSubscription: '<ServiceConnectionName>'   # Azure DevOps service connection to Azure
+  resourceGroup: 'TestRG'
+  location: 'eastus'
+  vmName: 'TestBasicVM'
+
+stages:
+- stage: Deploy
+  jobs:
+  - job: DeployVM
+    steps:
+    - task: AzureResourceManagerTemplateDeployment@3
+      inputs:
+        deploymentScope: 'Resource Group'
+        azureResourceManagerConnection: '$(azureSubscription)'
+        subscriptionId: '<YourSubscriptionID>'
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: '$(resourceGroup)'
+        location: '$(location)'
+        templateLocation: 'Linked artifact'
+        csmFile: 'arm-templates/vm-template.json'
+        csmParametersFile: 'arm-templates/vm-parameters.json'
+        deploymentMode: 'Incremental'
